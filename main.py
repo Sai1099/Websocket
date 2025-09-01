@@ -13,10 +13,15 @@ async def indices_ws(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
-            status = n.market_status()
-            data = status['marketState']
+          
+            # Replace with your NSE symbol fetch logic
+            all_indices = n.all_indices()
+            indices_data = [
+                {"index": idx["index"], "last": idx["last"]}
+                for idx in all_indices["data"]
+            ]
+            await websocket.send_text(json.dumps(indices_data))
 
-            await websocket.send_json(data)
             await asyncio.sleep(2)  # send every 2 seconds
     except Exception as e:
         print("Indices WS disconnected:", e)
@@ -29,10 +34,10 @@ async def quotes_ws(websocket: WebSocket, symbol: str):
     await websocket.accept()
     try:
         while True:
-            # Replace with your NSE symbol fetch logic
+
             q = n.stock_quote(f"{symbol}")
             data = q['priceInfo']
-            data = {"symbol": symbol.upper(), "price": 2500.45}
+
             await websocket.send_json(data)
             await asyncio.sleep(2)  # send every 2 seconds
     except Exception as e:
