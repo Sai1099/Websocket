@@ -1,49 +1,41 @@
-import asyncio
 import json
+import asyncio
+import websockets
 from fastapi import FastAPI, WebSocket
 import uvicorn
-from jugaad_data.nse import NSELive
 
 app = FastAPI()
-nse = NSELive()
 
-
+# WebSocket: Indices
 @app.websocket("/ws/indices")
-async def ws_indices(websocket: WebSocket):
+async def indices_ws(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
-            try:
-                data = nse.all_indices()
-                await websocket.send_text(json.dumps(data, default=str))
-            except Exception as e:
-                await websocket.send_text(json.dumps({"error": str(e)}))
-            await asyncio.sleep(2)  # adjust refresh interval
+            # Replace with your NSE indices fetch logic
+            data = {"index": "NIFTY 50", "value": 19800.25}
+            await websocket.send_json(data)
+            await asyncio.sleep(2)  # send every 2 seconds
     except Exception as e:
-        print(f"🔌 Disconnected (indices): {e}")
+        print("Indices WS disconnected:", e)
     finally:
         await websocket.close()
 
-
+# WebSocket: Quotes for a symbol
 @app.websocket("/ws/quotes/{symbol}")
-async def ws_quotes(websocket: WebSocket, symbol: str):
+async def quotes_ws(websocket: WebSocket, symbol: str):
     await websocket.accept()
     try:
         while True:
-            try:
-                data = nse.stock_quote(symbol)
-                await websocket.send_text(json.dumps(data, default=str))
-            except Exception as e:
-                await websocket.send_text(json.dumps({"error": str(e)}))
-            await asyncio.sleep(2)
+            # Replace with your NSE symbol fetch logic
+            data = {"symbol": symbol.upper(), "price": 2500.45}
+            await websocket.send_json(data)
+            await asyncio.sleep(2)  # send every 2 seconds
     except Exception as e:
-        print(f"🔌 Disconnected (quotes): {e}")
+        print(f"Quotes WS disconnected for {symbol}:", e)
     finally:
         await websocket.close()
 
 
 if __name__ == "__main__":
-    # Render expects host=0.0.0.0 and port from $PORT env
-    import os
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
