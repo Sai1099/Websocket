@@ -49,7 +49,3 @@ if st.button("🔗 Get Live Data"):
             st.error(f"❌ Error: {e}")
 
 # Show stored data if available
-if st.session_state.data:
-    st.write("---")
-    st.subheader("Current Data")
-    display_data(st.session_state.data)
