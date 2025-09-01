@@ -2,18 +2,20 @@ import json
 import asyncio
 import websockets
 from fastapi import FastAPI, WebSocket
+from jugaad_data.nse import NSELive
 import uvicorn
 
 app = FastAPI()
-
+n = NSELive()
 # WebSocket: Indices
 @app.websocket("/ws/indices")
 async def indices_ws(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
-            # Replace with your NSE indices fetch logic
-            data = {"index": "NIFTY 50", "value": 19800.25}
+            status = n.market_status()
+            data = status['marketState']
+
             await websocket.send_json(data)
             await asyncio.sleep(2)  # send every 2 seconds
     except Exception as e:
@@ -28,6 +30,8 @@ async def quotes_ws(websocket: WebSocket, symbol: str):
     try:
         while True:
             # Replace with your NSE symbol fetch logic
+            q = n.stock_quote(f"{symbol}")
+            data = q['priceInfo']
             data = {"symbol": symbol.upper(), "price": 2500.45}
             await websocket.send_json(data)
             await asyncio.sleep(2)  # send every 2 seconds
