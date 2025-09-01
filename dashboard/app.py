@@ -31,11 +31,11 @@ def display_data(market_data):
             
             # Color based on change
             if change > 0:
-                st.success(f"**{item['index']}**\n₹{price:,.2f} (+{change:.2f})")
+                st.success(f"**{item['index']}**\n₹{price:,.2f})")
             elif change < 0:
-                st.error(f"**{item['index']}**\n₹{price:,.2f} ({change:.2f})")
+                st.error(f"**{item['index']}**\n₹{price:,.2f}")
             else:
-                st.info(f"**{item['index']}**\n₹{price:,.2f} ({change:.2f})")
+                st.info(f"**{item['index']}**\n₹{price:,.2f}")
 
 # Connect button
 if st.button("🔗 Get Live Data"):
